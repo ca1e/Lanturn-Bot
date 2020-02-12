@@ -164,7 +164,7 @@ class RaidCommands(commands.Cog):
 				await self.userChannel.send("People remaining in line: " + str(q.size()))
 				self.clearData()
 			else:
-				await self.userChannel.send("Invalid seed. Please try a different Pokemon. People remaining in line: " + str(q.size()))
+				await self.userChannel.send(self.id + " Invalid seed. Please try a different Pokemon. People remaining in line: " + str(q.size()))
 				self.clearData()
 
 			
