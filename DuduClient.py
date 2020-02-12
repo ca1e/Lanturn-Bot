@@ -24,7 +24,7 @@ from NumpadInterpreter import *
 #Get yuor switch IP from the system settings under the internet tab
 #Should be listed under "Connection Status" as 'IP Address'
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("YOUR SWITCH IP HERE", 6000))
+s.connect(("10.0.0.90", 6000))
 code = ""
 
 def sendCommand(s, content):
@@ -50,9 +50,14 @@ def bytesToInt(bytedata, length):
 def convertToString(arr):
     size = len(arr)
     i = 0
+    strings = list()
     accumulator = ""
     while i < size:
-        accumulator = accumulator + str(chr(arr[i]))
+        if arr[i] == 0x0A:
+            strings.append(accumulator)
+            accumulator = ""
+        if arr[i] != 0x0D or arr[i] != 0x0A:
+            accumulator = accumulator + str(chr(arr[i]))
         i += 1
 
     return accumulator
@@ -74,16 +79,17 @@ def convertToBytes(arr):
 #Allows for faster and more reliable inputs
 def sendCmdHelper(s, cmd):
     sendCommand(s, cmd)
-    time.sleep(0.5)
+    time.sleep(0.55)
     echo = s.recv(689)
-    echo = convertToString(echo[0:-2])
-    print(str(echo))
+    strng = convertToString(echo[0:-2])
     #If response not received, try again
     #If received, go to the next button
-    while echo != cmd:
+    while not cmd in strng:
         #sendCommand(s, cmd)
+        print("Error!")
         echo = s.recv(689)
-        echo = convertToString(echo[0:-2])
+        strng = convertToString(echo[0:-2])
+    print(str(cmd))
 
 #Cleans out the file relied for communication
 def cleanEnvironment():
@@ -112,7 +118,7 @@ def interpretStringList(arr):
     while i < length:
         sendCmdHelper(s, arr[i])
         i+=1
-        time.sleep(0.55)
+        time.sleep(0.60)
 
 #Calibrated for games set to english
 #Will exit the trade once the timeout period is reached
@@ -131,8 +137,8 @@ def timeOutTradeSearch():
     time.sleep(0.55)
 
     #uncomment if you are using in Japanese
-    #sendCmdHelper(s, "click A")
-    #time.sleep(0.55)
+    sendCmdHelper(s, "click A")
+    time.sleep(0.55)
     sendCmdHelper(s, "click B")
     time.sleep(0.55)
     sendCmdHelper(s, "click B")
@@ -164,14 +170,14 @@ def initiateTrade():
     time.sleep(0.55)
 
     #uncomment if you are using in Japanese
-    #sendCmdHelper(s, "click A")
-    #time.sleep(0.55)
+    sendCmdHelper(s, "click A")
+    time.sleep(0.55)
 
 
     #Get passcode button sequence and input them
     #Pass None if you want your code randomly generated
     #Pass in a 4 digit number not containing any zeros for a fixed code
-    datalist, code = getButtons(1111)
+    datalist, code = getButtons(None)
     interpretStringList(datalist)
 
     #Confirm passcode and exit the menu
@@ -245,8 +251,18 @@ while True:
         while True:
             sendCommand(s, "peek 0x2E322064 4")
             time.sleep(0.5)
-            tradeCheck = s.recv(689)
-            tradeCheck = int(convertToBytes(tradeCheck), 16)
+
+            proceed = False
+            while not proceed:
+                try:
+                    tradeCheck = s.recv(689)
+                    tradeCheck = int(convertToBytes(tradeCheck), 16)
+                    proceed = True
+                except:
+                    print("Error getting data, trying again.")
+                    sendCommand(s, "peek 0x2E322064 4")
+                    time.sleep(0.5)
+
             end = time.time()
             if tradeCheck != 0:
                 print("Trade Started!")
@@ -262,8 +278,18 @@ while True:
             while True:
                 sendCommand(s, "peek 0x2E32209A 4")
                 time.sleep(0.5)
-                memCheck = s.recv(689)
-                memCheck = int(convertToBytes(memCheck), 16)
+
+                proceed = False
+                while not proceed:
+                    try:
+                        memCheck = s.recv(689)
+                        memCheck = int(convertToBytes(memCheck), 16)
+                        proceed = True
+                    except:
+                        print("Error getting data, trying again.")
+                        sendCommand(s, "peek 0x2E32209A 4")
+                        time.sleep(0.5)
+
                 #print(memCheck)
                 end = time.time()
                 if memCheck != 0:
