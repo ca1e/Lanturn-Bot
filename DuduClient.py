@@ -24,7 +24,7 @@ from NumpadInterpreter import *
 #Get yuor switch IP from the system settings under the internet tab
 #Should be listed under "Connection Status" as 'IP Address'
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.connect(("10.0.0.90", 6000))
+s.connect(("YOUR SWITCH IP", 6000))
 code = ""
 
 def sendCommand(s, content):
@@ -137,8 +137,8 @@ def timeOutTradeSearch():
     time.sleep(0.55)
 
     #uncomment if you are using in Japanese
-    sendCmdHelper(s, "click A")
-    time.sleep(0.55)
+    #sendCmdHelper(s, "click A")
+    #time.sleep(0.55)
     sendCmdHelper(s, "click B")
     time.sleep(0.55)
     sendCmdHelper(s, "click B")
@@ -170,8 +170,8 @@ def initiateTrade():
     time.sleep(0.55)
 
     #uncomment if you are using in Japanese
-    sendCmdHelper(s, "click A")
-    time.sleep(0.55)
+    #sendCmdHelper(s, "click A")
+    #time.sleep(0.55)
 
 
     #Get passcode button sequence and input them
