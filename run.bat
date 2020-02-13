@@ -1,2 +1,2 @@
-start cmd /k python %cd%\DuduClient.py
-start cmd /k python %cd%\bot.py
+start cmd /k python %~dp0\DuduClient.py
+start cmd /k python %~dp0\bot.py
