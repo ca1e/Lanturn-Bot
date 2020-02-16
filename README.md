@@ -24,6 +24,8 @@ Use pip commands to install the following:
 
 pip install z3-solver
 
+python -m pip install -U discord.py
+
 **Current Features:**
 
 $GetSeed - Gets a user's seed and next square/star shiny frame
